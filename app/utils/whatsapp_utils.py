@@ -3,6 +3,7 @@ from flask import current_app, jsonify
 import json
 import requests
 import re
+import datetime
 
 def log_http_response(response):
     logging.info(f"Status: {response.status_code}")
@@ -35,6 +36,11 @@ def send_message(data):
         if response.status_code != 200:
             logging.error(f"❌ ERROR DE META API: {response.status_code}")
             logging.error(f"❌ DETALLE DEL ERROR: {response.text}")
+            
+            # Guardar en archivo de alertas críticas
+            with open("alertas_error.txt", "a", encoding="utf-8") as f:
+                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                f.write(f"[{timestamp}] ❌ ERROR META {response.status_code}: {response.text}\n")
             
         response.raise_for_status()
     except Exception as e:
